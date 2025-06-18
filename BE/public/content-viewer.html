@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Content Viewer - Learning Platform</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .navbar {
+            background-color: #ffffff;
+            padding: 1rem 2rem;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .logo {
+            color: #00a896;
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-decoration: none;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        .content-viewer {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 aspect ratio */
+            height: 0;
+            background: #000;
+        }
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .content-info {
+            padding: 2rem;
+        }
+        .content-title {
+            font-size: 1.8rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        .content-description {
+            color: #666;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+        .content-metadata {
+            display: flex;
+            gap: 2rem;
+            color: #888;
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
+        .lyrics-section {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-top: 2rem;
+        }
+        .lyrics-title {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        .lyrics-content {
+            white-space: pre-line;
+            line-height: 1.8;
+            color: #444;
+        }
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #00a896;
+            text-decoration: none;
+            font-weight: 500;
+            margin-bottom: 1rem;
+        }
+        .back-button:hover {
+            text-decoration: underline;
+        }
+        .vocabulary-section {
+            margin-top: 2rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 2rem;
+        }
+        .vocabulary-title {
+            font-size: 1.2rem;
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        .vocabulary-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+        .vocabulary-item {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+        }
+        .word {
+            font-weight: bold;
+            color: #00a896;
+            margin-bottom: 0.5rem;
+        }
+        .definition {
+            color: #666;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/dashboard.html" class="logo">Learning Platform</a>
+    </nav>
+
+    <div class="container">
+        <a href="/dashboard.html" class="back-button">
+            ← Back to Dashboard
+        </a>
+
+        <div class="content-viewer">
+            <div class="video-container" id="videoContainer">
+                <!-- Video will be loaded here -->
+            </div>
+            <div class="content-info">
+                <h1 class="content-title" id="contentTitle">Loading...</h1>
+                <div class="content-metadata">
+                    <span id="contentType">Video</span>
+                    <span id="contentDuration">5:23</span>
+                    <span id="contentLevel">Intermediate</span>
+                </div>
+                <p class="content-description" id="contentDescription">Loading...</p>
+
+                <div class="lyrics-section" id="lyricsSection" style="display: none;">
+                    <h2 class="lyrics-title">Lyrics</h2>
+                    <div class="lyrics-content" id="lyricsContent"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="vocabulary-section">
+            <h2 class="vocabulary-title">Key Vocabulary</h2>
+            <div class="vocabulary-list" id="vocabularyList">
+                <!-- Vocabulary items will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get content ID from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const contentId = urlParams.get('id');
+        const contentType = urlParams.get('type');
+
+        // Content data (in a real app, this would come from your backend)
+        const contentData = {
+            'shape-of-you': {
+                type: 'song',
+                title: 'Shape of You - Ed Sheeran',
+                description: 'Learn English through this popular song by Ed Sheeran. Practice pronunciation and learn new vocabulary.',
+                videoId: 'JGwWNGJdvx8',
+                lyrics: `The club isn't the best place to find a lover
+So the bar is where I go...`,
+                vocabulary: [
+                    { word: 'Shape', definition: 'The external form, contours, or outline of someone or something' },
+                    { word: 'Bar', definition: 'A place that serves alcoholic drinks' },
+                    { word: 'Club', definition: 'A place for dancing and entertainment' }
+                ]
+            },
+            'thay-giao-ba': {
+                type: 'movie',
+                title: 'Thầy Giáo Ba',
+                description: 'Learn Vietnamese through this comedy video. Perfect for beginners to intermediate learners.',
+                videoId: 'example-video-id',
+                vocabulary: [
+                    { word: 'Thầy giáo', definition: 'Teacher (male)' },
+                    { word: 'Ba', definition: 'Three' },
+                    { word: 'Học sinh', definition: 'Student' }
+                ]
+            }
+        };
+
+        // Load content based on ID
+        function loadContent(id) {
+            const content = contentData[id];
+            if (!content) {
+                window.location.href = '/dashboard.html';
+                return;
+            }
+
+            // Update page content
+            document.getElementById('contentTitle').textContent = content.title;
+            document.getElementById('contentType').textContent = content.type === 'song' ? 'Song' : 'Video';
+            document.getElementById('contentDescription').textContent = content.description;
+
+            // Show/hide lyrics section for songs
+            const lyricsSection = document.getElementById('lyricsSection');
+            if (content.type === 'song' && content.lyrics) {
+                lyricsSection.style.display = 'block';
+                document.getElementById('lyricsContent').textContent = content.lyrics;
+            } else {
+                lyricsSection.style.display = 'none';
+            }
+
+            // Load vocabulary
+            const vocabularyList = document.getElementById('vocabularyList');
+            vocabularyList.innerHTML = content.vocabulary.map(item => `
+                <div class="vocabulary-item">
+                    <div class="word">${item.word}</div>
+                    <div class="definition">${item.definition}</div>
+                </div>
+            `).join('');
+
+            // Load video
+            const videoContainer = document.getElementById('videoContainer');
+            videoContainer.innerHTML = `
+                <iframe
+                    src="https://www.youtube.com/embed/${content.videoId}"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen>
+                </iframe>
+            `;
+        }
+
+        // Load content when page loads
+        if (contentId) {
+            loadContent(contentId);
+        } else {
+            window.location.href = '/dashboard.html';
+        }
+    </script>
+</body>
+</html> 
