@@ -34,6 +34,21 @@ router.get('/test', async (req, res) => {
 router.post('/register', async (req, res) => {
   try {
     const { email, password, name } = req.body;
+    
+    // Check if user already exists
+    const existingUser = await prisma.user.findUnique({
+      where: { email }
+    });
+    
+    if (existingUser) {
+      return res.status(409).json({ error: 'Account already exists with this email' });
+    }
+    
+    // Validate password length (7-8 characters minimum)
+    if (!password || password.length < 7) {
+      return res.status(400).json({ error: 'Password must be at least 7 characters long' });
+    }
+    
     const user = await prisma.user.create({
       data: {
         email,

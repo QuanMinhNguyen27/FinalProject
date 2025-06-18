@@ -10,6 +10,19 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  TRUE_FALSE
+  FILL_BLANK
+  MATCHING
+}
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -18,12 +31,96 @@ model User {
   role      String   @default("user")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  
+  // Learning progress tracking
+  progress  Progress[]
+  flashcards Flashcard[]
+  quizResults QuizResult[]
+  vocabulary  Vocabulary[]
 }
 
-model Course {
+model Vocabulary {
+  id          Int      @id @default(autoincrement())
+  word        String
+  definition  String
+  example     String?
+  pronunciation String?
+  partOfSpeech String?
+  synonyms    String? // JSON string for PostgreSQL
+  difficulty  Difficulty @default(BEGINNER)
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Spaced repetition tracking
+  repetitions Int      @default(0)
+  nextReview  DateTime @default(now())
+  easeFactor  Float    @default(2.5)
+  interval    Int      @default(1)
+}
+
+model Flashcard {
+  id          Int      @id @default(autoincrement())
+  front       String   // Question/Word
+  back        String   // Answer/Definition
+  category    String   // Vocabulary, Grammar, etc.
+  difficulty  Difficulty
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Spaced repetition
+  repetitions Int      @default(0)
+  nextReview  DateTime @default(now())
+  easeFactor  Float    @default(2.5)
+  interval    Int      @default(1)
+}
+
+model Quiz {
   id          Int      @id @default(autoincrement())
   title       String
   description String?
+  category    String
+  difficulty  Difficulty
+  questions   Question[]
+  quizResults QuizResult[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model Question {
+  id          Int      @id @default(autoincrement())
+  question    String
+  type        QuestionType
+  options     String? // JSON string for PostgreSQL
+  correctAnswer String
+  explanation String?
+  quizId      Int
+  quiz        Quiz     @relation(fields: [quizId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model QuizResult {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  quizId      Int
+  quiz        Quiz     @relation(fields: [quizId], references: [id])
+  score       Int
+  totalQuestions Int
+  timeSpent   Int      // in seconds
+  completedAt DateTime @default(now())
+}
+
+model Progress {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
+  category    String   // Vocabulary, Grammar, etc.
+  level       Int      @default(1)
+  experience  Int      @default(0)
+  streak      Int      @default(0)
+  lastStudied DateTime @default(now())
 }
