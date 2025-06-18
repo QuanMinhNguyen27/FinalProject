@@ -115,6 +115,8 @@ const LogoutButton = styled.button`
   }
 `;
 
+const getInitial = (name: string) => name ? name[0].toUpperCase() : '?';
+
 const Dashboard = () => {
   const [user, setUser] = useState<{ email: string, name?: string } | null>(null);
   const [loading, setLoading] = useState(true);
@@ -175,32 +177,37 @@ const Dashboard = () => {
   }
 
   return (
-    <Layout>
-      <ImageSection>
-        <StyledImg src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="Dashboard Visual" />
-      </ImageSection>
-      <Card>
-        <NavButtons>
-          <NavButton className="active">Dashboard</NavButton>
-          <NavButton onClick={() => navigate('/profile')}>Profile</NavButton>
-          <NavButton onClick={() => navigate('/vocab-bank')}>Vocab Bank</NavButton>
-          <NavButton onClick={() => navigate('/watching')}>Watching</NavButton>
-        </NavButtons>
-        <Welcome>Welcome back {user.name || user.email.split('@')[0]}! <span role="img" aria-label="wave">👋</span></Welcome>
-        <Subtext>Check your stats and vocabulary progress</Subtext>
-        <StatsRow>
-          <StatCard>
-            <StatLabel>This Week's Words</StatLabel>
-            <StatValue>27</StatValue>
-          </StatCard>
-          <StatCard>
-            <StatLabel>Rank on Leaderboard</StatLabel>
-            <StatValue>#4</StatValue>
-          </StatCard>
-        </StatsRow>
-        <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
-      </Card>
-    </Layout>
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh', background: '#fafbfc' }}>
+      <nav style={{ position: 'relative', height: 80 }}>
+        {/* No navigation or profile button */}
+      </nav>
+      <Layout>
+        <ImageSection>
+          <StyledImg src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="Dashboard Visual" />
+        </ImageSection>
+        <Card>
+          <NavButtons>
+            <NavButton className="active">Dashboard</NavButton>
+            <NavButton onClick={() => navigate('/profile')}>Profile</NavButton>
+            <NavButton onClick={() => navigate('/vocab-bank')}>Vocab Bank</NavButton>
+            <NavButton onClick={() => navigate('/watching')}>Watching</NavButton>
+          </NavButtons>
+          <Welcome>Welcome back {user.name || user.email.split('@')[0]}! <span role="img" aria-label="wave">👋</span></Welcome>
+          <Subtext>Check your stats and vocabulary progress</Subtext>
+          <StatsRow>
+            <StatCard>
+              <StatLabel>This Week's Words</StatLabel>
+              <StatValue>27</StatValue>
+            </StatCard>
+            <StatCard>
+              <StatLabel>Rank on Leaderboard</StatLabel>
+              <StatValue>#4</StatValue>
+            </StatCard>
+          </StatsRow>
+          <LogoutButton onClick={handleLogout}>Logout</LogoutButton>
+        </Card>
+      </Layout>
+    </div>
   );
 };
 

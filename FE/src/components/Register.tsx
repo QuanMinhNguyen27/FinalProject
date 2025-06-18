@@ -72,6 +72,13 @@ const LinkText = styled.p`
   }
 `;
 
+const PasswordHint = styled.div`
+  font-size: 0.8rem;
+  color: #666;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
+`;
+
 const Register = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -85,6 +92,12 @@ const Register = () => {
 
     if (password !== confirmPassword) {
       setError('Passwords do not match');
+      return;
+    }
+
+    // Client-side password validation
+    if (password.length < 7) {
+      setError('Password must be at least 7 characters long');
       return;
     }
 
@@ -103,7 +116,7 @@ const Register = () => {
         localStorage.setItem('token', data.token);
         navigate('/dashboard');
       } else {
-        setError(data.message || 'Registration failed');
+        setError(data.error || 'Registration failed');
       }
     } catch (err) {
       setError('An error occurred. Please try again.');
@@ -130,6 +143,7 @@ const Register = () => {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
+          <PasswordHint>Password must be at least 7 characters long</PasswordHint>
           <Input
             type="password"
             placeholder="Confirm Password"
