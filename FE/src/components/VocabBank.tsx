@@ -170,6 +170,79 @@ const BackButton = styled.button`
   }
 `;
 
+const QuizUnlockCard = styled.div`
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 16px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  color: white;
+  position: relative;
+  overflow: hidden;
+`;
+
+const QuizUnlockContent = styled.div`
+  position: relative;
+  z-index: 2;
+`;
+
+const QuizUnlockTitle = styled.h3`
+  margin: 0 0 1rem 0;
+  font-size: 1.4rem;
+  font-weight: 600;
+`;
+
+const ProgressContainer = styled.div`
+  margin: 1.5rem 0;
+`;
+
+const ProgressBar = styled.div`
+  width: 100%;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+`;
+
+const ProgressFill = styled.div<{ progress: number }>`
+  height: 100%;
+  background: linear-gradient(90deg, #ffd700, #ffed4e);
+  width: ${props => Math.min(props.progress, 100)}%;
+  transition: width 0.3s ease;
+  border-radius: 6px;
+`;
+
+const ProgressText = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9rem;
+  opacity: 0.9;
+`;
+
+const QuizButton = styled.button<{ disabled: boolean }>`
+  background: ${props => props.disabled ? 'rgba(255, 255, 255, 0.3)' : '#ffd700'};
+  color: ${props => props.disabled ? 'rgba(255, 255, 255, 0.7)' : '#333'};
+  border: none;
+  border-radius: 12px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: ${props => props.disabled ? 'not-allowed' : 'pointer'};
+  transition: all 0.2s;
+  margin-top: 1rem;
+  
+  &:hover {
+    transform: ${props => props.disabled ? 'none' : 'translateY(-2px)'};
+    box-shadow: ${props => props.disabled ? 'none' : '0 4px 12px rgba(0,0,0,0.2)'};
+  }
+`;
+
+const SparkleIcon = styled.span`
+  font-size: 1.2rem;
+  margin-right: 0.5rem;
+`;
+
 type VocabWord = {
   meaning: string;
   example: string;
@@ -200,6 +273,19 @@ const VocabBank = () => {
   const [editWord, setEditWord] = useState<VocabWord | null>(null);
   const [loadingWords, setLoadingWords] = useState<Set<number>>(new Set());
   const navigate = useNavigate();
+
+  // Quiz unlock logic
+  const QUIZ_UNLOCK_THRESHOLD = 10; // Need 10 words to unlock quiz
+  const currentWordCount = words.length;
+  const progress = (currentWordCount / QUIZ_UNLOCK_THRESHOLD) * 100;
+  const wordsNeeded = Math.max(0, QUIZ_UNLOCK_THRESHOLD - currentWordCount);
+  const isQuizUnlocked = currentWordCount >= QUIZ_UNLOCK_THRESHOLD;
+
+  const handleStartQuiz = () => {
+    if (isQuizUnlocked) {
+      navigate('/quiz');
+    }
+  };
 
   const filteredWords = words.filter(word =>
     word.meaning.toLowerCase().includes(search.toLowerCase())
@@ -306,6 +392,51 @@ const VocabBank = () => {
   return (
     <Container>
       <Title>Vocab Bank</Title>
+      
+      {/* Quiz Unlock Progress Card */}
+      <QuizUnlockCard>
+        <QuizUnlockContent>
+          <QuizUnlockTitle>
+            {isQuizUnlocked ? (
+              <>
+                <SparkleIcon>✨</SparkleIcon>
+                Quiz Unlocked!
+              </>
+            ) : (
+              <>
+                <SparkleIcon>🎯</SparkleIcon>
+                Unlock Quiz Mode
+              </>
+            )}
+          </QuizUnlockTitle>
+          
+          <div style={{ opacity: 0.9, marginBottom: '1rem' }}>
+            {isQuizUnlocked ? (
+              'Congratulations! You have enough words to start practicing with quizzes.'
+            ) : (
+              `Collect ${wordsNeeded} more word${wordsNeeded !== 1 ? 's' : ''} to unlock quiz mode and test your knowledge!`
+            )}
+          </div>
+          
+          <ProgressContainer>
+            <ProgressBar>
+              <ProgressFill progress={progress} />
+            </ProgressBar>
+            <ProgressText>
+              <span>{currentWordCount} / {QUIZ_UNLOCK_THRESHOLD} words</span>
+              <span>{Math.round(progress)}% complete</span>
+            </ProgressText>
+          </ProgressContainer>
+          
+          <QuizButton 
+            disabled={!isQuizUnlocked} 
+            onClick={handleStartQuiz}
+          >
+            {isQuizUnlocked ? '🚀 Start Quiz' : `🔒 Need ${wordsNeeded} more word${wordsNeeded !== 1 ? 's' : ''}`}
+          </QuizButton>
+        </QuizUnlockContent>
+      </QuizUnlockCard>
+      
       <SearchInput
         type="text"
         placeholder="Search words..."

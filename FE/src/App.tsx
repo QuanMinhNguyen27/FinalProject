@@ -6,6 +6,8 @@ import Dashboard from './components/Dashboard';
 import Profile from './components/Profile';
 import VocabBank from './components/VocabBank';
 import Watching from './components/Watching';
+import Quiz from './components/Quiz';
+import Flashcard from './components/Flashcard';
 import './App.css';
 
 const RedirectToProperPage = () => {
@@ -23,6 +25,8 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/vocab-bank" element={<VocabBank />} />
         <Route path="/watching" element={<Watching />} />
+        <Route path="/quiz" element={<Quiz />} />
+        <Route path="/flashcard" element={<Flashcard />} />
         <Route path="/" element={<RedirectToProperPage />} />
       </Routes>
     </Router>
